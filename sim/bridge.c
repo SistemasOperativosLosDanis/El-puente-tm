@@ -29,19 +29,21 @@ void bridge_in(tcar *dcar) {
  *   if not car must wait 
  *   if yes cars_on_bridge++, set cur_direction, call stat_car_in()
  */
-	if(cars_on_bridge < 3 && (cur_direction == dcar->my_direction || cur_direction == EMPTY)){
-		cars_on_bridge[dcar->my_direction]++;
-		cur_direction = dcar->my_direction;
-		stat_car_in(dcar);
-	}
+	lock(mtx);
 
-	else {
-	//A dormir (0w(0w(0w0)w0)w0)
-		//     greeetings~!
-	dbrige.cars_waiting[dcar->my_direction]++;
-	dbridge.VCs.add([dcar->my_direction]); //Add?
+	
+	//Si no puede cruzar, a la cama
+	while(cars_on_bridge < 3 && (cur_direction == dcar->my_direction || cur_direction == EMPTY)){
+		//A dormir (0w(0w(0w0)w0)w0)
+		dbrige.cars_waiting[dcar->my_direction]++;
+		pthread_cond_wait(&(dbridge.VCs[dcar->my_direction]), &(mtx));
 	}
-
+	
+	//Cuando se le despierte, cruza
+	cars_on_bridge[dcar->my_direction]++;
+	cur_direction = dcar->my_direction;
+	stat_car_in(dcar);
+	unlock(mtx);
 }
 
 void bridge_out(tcar *dcar) {
@@ -52,7 +54,13 @@ void bridge_out(tcar *dcar) {
  * if not, check if there are cars waiting in the oposite direction
  * else cur_direction=EMPTY
  */
+
+/*Tienes que coger el lock, porque ya sabes que has cruzado y entonces despiertas
+a la gente de tu direccion de origen si hay alguien esperando o a la gente de la direccion a
+la opuesta si hay más gente allí o lo que sea :3*/
+	lock(mtx)
 	cars_on_bridge--;
+	
 	stat_car_out(dcar);
 	//Si hay gente esperando en mi dir
 	if(dbrige.cars_waiting[dcar->my_direction] != 0){
@@ -65,6 +73,8 @@ void bridge_out(tcar *dcar) {
 	else{
 	cur_direction = EMPTY;
 	}
+
+	unlock(mtx)
 }
 
 void crossing_bridge(tcar *dcar) {

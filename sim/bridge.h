@@ -7,7 +7,7 @@
 #define LENGTH 3
 
 typedef struct {
-	pthread_mutex_t mtx;
+	pthread_mutex_t mtx;	//Mutex
 	pthread_cond_t VCs[2];
 	int cars_on_bridge;
 	int cur_direction;
