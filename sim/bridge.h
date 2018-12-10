@@ -13,6 +13,7 @@ typedef struct {
 	int cur_direction;
 	int cars_waiting[2];
 } tbridge;
+
 tbridge dbridge;
 
 void init_bridge();
