@@ -37,7 +37,7 @@ void bridge_in(tcar *dcar) {
 	pthread_mutex_lock(&dbridge.mtx);
 
 	
-	while(dbridge.cars_on_bridge >= 3 && (dbridge.cur_direction != dcar->my_direction || cur_direction != EMPTY)){
+	while(dbridge.cars_on_bridge >= 3 && (dbridge.cur_direction != dcar->my_direction || 	  dbridge.cur_direction != EMPTY)){
 		
 		dbridge.cars_waiting[dcar->my_direction]++;
 		pthread_cond_wait(&dbridge.VCs[dcar->my_direction], &dbridge.mtx);
@@ -45,7 +45,7 @@ void bridge_in(tcar *dcar) {
 	
 	
 	dbridge.cars_waiting[dcar->my_direction]--;
-	dbridge.cars_on_bridge[dcar->my_direction]++;
+	dbridge.cars_on_bridge++;
 	dbridge.cur_direction = dcar->my_direction;
 
 	stat_car_in(dcar);
@@ -77,14 +77,14 @@ la opuesta si hay más gente allí o lo que sea :3*/
 	}
 
 	//Si hay gente esperando en la otra direccion
-	else if (dbrige.cars_waiting[(dcar->my_direction+1)%2]){
+	else if (dbridge.cars_waiting[((dcar->my_direction+1)%2)] ){
 		//Cambiar la cur_direction??
-		pthread_cond_broadcast(&dbridge.VCs[dcar->my_direction+1)%2]);
+		pthread_cond_broadcast(&dbridge.VCs[((dcar->my_direction+1)%2)]);
 	}
 
 	//Si no hay nadie, empty
 	else{
-	cur_direction = EMPTY;
+	dbridge.cur_direction = EMPTY;
 	}
 
 	pthread_mutex_unlock(&dbridge.mtx);

@@ -66,9 +66,9 @@ int sys_barrier_wait(sys_barrier_t *barrier)
         //Ponemos los threads a 0 para el siguiente wait que se quiera hacer.
     	barrier->nr_threads_arrived = 0;  
     	pthread_cond_broadcast(&(barrier->cond));
-  	}
+  	
 	//Fin region critica
-    //Unlock antes de salir de la función
+   	 //Unlock antes de salir de la función
   	pthread_mutex_unlock(&(barrier->mutex));
     
 	return 0;
